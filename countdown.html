@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Countdown</title>
+        <style>
+            .countdown-item {
+                font-size: 30px;
+                color: #333;
+                margin-right: 10px;
+            }
+        </style>
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <script>
+            var countdownInterval;
+
+            window.onload = function() {
+                startCountdownFromHash();
+                window.onhashchange = startCountdownFromHash;
+            }
+
+            function startCountdownFromHash() {
+                var countdownTime = getHashtagParameter();
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+                startCountdown(countdownTime);
+            }
+
+            function getHashtagParameter() {
+                var url = new URL(window.location.href);
+                var time = url.searchParams.get('t');
+                if (time) {
+                    return time;
+                } else {
+                    var hashtagIndex = url.href.indexOf('#');
+                    if (hashtagIndex !== -1) {
+                        return url.href.substring(hashtagIndex + 1);
+                    } else {
+                        return null;
+                    }
+                }
+            }
+
+            function startCountdown(time) {
+                var countdownDate = new Date(time).getTime();
+                countdownInterval = setInterval(function() {
+                    var utc_now = new Date().getTime();
+                    var distance = countdownDate - utc_now;
+
+                    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById("days").innerHTML = days + "d";
+                    document.getElementById("hours").innerHTML = hours + "h";
+                    document.getElementById("minutes").innerHTML = minutes + "m";
+                    document.getElementById("seconds").innerHTML = seconds + "s";
+
+                    if (distance < 0) {
+                        clearInterval(countdownInterval);
+                        document.getElementById("days").innerHTML = "0d";
+                        document.getElementById("hours").innerHTML = "0h";
+                        document.getElementById("minutes").innerHTML = "0m";
+                        document.getElementById("seconds").innerHTML = "0s";
+                    }
+                }, 1000);
+            }
+        </script>
+    </head>
+    <body>
+        <span id="days" class="countdown-item"></span>
+        <span id="hours" class="countdown-item"></span>
+        <span id="minutes" class="countdown-item"></span>
+        <span id="seconds" class="countdown-item"></span>
+    </body>
+</html>
